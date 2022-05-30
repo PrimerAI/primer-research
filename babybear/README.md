@@ -1,6 +1,6 @@
 # Babybear Model
 
-This is the code for our paper ["An inference triage model on classification and ner problems"](https://arxiv.org/abs/2205.11747).
+This is the code for our paper ["BabyBear: Cheap inference triage for expensive language models"](https://arxiv.org/abs/2205.11747).
 
 The code is written in python.
 
