@@ -3,11 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import RandomizedSearchCV
 import tensorflow_hub as hub
-# ? fix sif
-# from primer_nlx.embedding.SIF import SIF
-# from primer_nlx.utils.modelresult import ModelResult
-# from primer_nlx.zoo import ZooAnimal
-# np.random.seed(0)
+
 n_estimators = [int(x) for x in range(200,2000,200)]
 grid = {'n_estimators': n_estimators,
         'min_child_weight': range(1,6,2),
@@ -34,8 +30,7 @@ class RFBabyBear():
         """Inits SampleClass with language_model and keyword arguments."""
         super().__init__()
         self.rf_kwargs = rf_kwargs
-        # self.language_model = language_model or SIF("latest-small")
-        self.language_model = language_model or hub.load("/Users/leilakhalili/Downloads/universal-sentence-encoder_4")
+        self.language_model = language_model or hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
         self.model = RandomizedSearchCV(XGBClassifier(**self.rf_kwargs), grid)
 
     def train(self, doc, labels, n_class=2):
@@ -44,7 +39,7 @@ class RFBabyBear():
         Args:
             doc: The training documents
             labels: The lables of the training documents which are human-labeled data
-            or provided by papabear.
+            or provided by mamabear.
 
         Returns:
             ModelResult containing:
@@ -85,5 +80,5 @@ class RFBabyBear():
 
     def __call__(self, doc):
         # Inference Triage is based on the prediction_probabilties (ModelResults.probs)
-        # ModelResults.probs > confidence_th will not be sent to papabear
+        # ModelResults.probs > confidence_th will not be sent to mamabear
         return self.score(doc)

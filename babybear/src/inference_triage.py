@@ -8,34 +8,32 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 from transformers import AutoModelForSequenceClassification
 from scipy.special import softmax
 import pickle as pkl
-# from primer_nlx.nn.classifier import Classifier
-# from primer_nlx.utils.misc_utils import choose_device
-# from primer_nlx.utils.modelresult import ModelResult
-# from primer_nlx.zoo import ZooAnimal
+
 np.random.seed(0)
 import time
 
-class PapabearClassifierSentiment:
+class MamabearClassifierSentiment:
     """
     """
 
     def __init__(
         self,
         model,
+        device=0,
         tokenizer=None
     ):
 
-        self.classifier = pipeline("sentiment-analysis", model=model, tokenizer=model, device=0, return_all_scores=True)
+        self.classifier = pipeline("sentiment-analysis", model=model, tokenizer=model, device=device, return_all_scores=True)
 
 
-    def _run_papabear(self, texts):
-        """Runs papabear model on the input text file.
+    def _run_mamabear(self, texts):
+        """Runs mamabear model on the input text file.
 
         Args:
-            texts: Documents sent to papabear for classification
+            texts: Documents sent to mamabear for classification
 
         Return:
-            papa_pred: Prediction probability calculated by papabear
+            mama_pred: Prediction probability calculated by mamabear
         """
         labels = []
         for text in texts:
@@ -46,18 +44,18 @@ class PapabearClassifierSentiment:
                 score += [prediction[0][counter]['score']]
             labels += [np.argmax(np.asarray(score))]
 
-        return {'y_papabear':np.asarray(labels)}
+        return {'y_mamabear':np.asarray(labels)}
 
     def __call__(self, doc):
-        """Alias for _run_papabear.
+        """Alias for _run_mamabear.
 
-        See _run_papabear for documentation.
+        See _run_mamabear for documentation.
         """
-        return self._run_papabear(doc)
+        return self._run_mamabear(doc)
 
 
-class PapabearClassifier:
-    """This class defines the papabear classifier which is a model from primer_nlx.nn.classifier.
+class MamabearClassifier:
+    """This class defines the mamabear classifier which is a model from primer_nlx.nn.classifier.
     The current design is for binary classification. In case of multi-classes classification, by
     summing up labels_to_sum_up, the problems is converted to a binary classification problem.
 
@@ -73,61 +71,61 @@ class PapabearClassifier:
     def __init__(
         self,
         model,
+        device=0,
         tokenizer=None
     ):
 
         self.model = model
         self.tokenizer = tokenizer
-        # self.device = 'cpu'
-        self.nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=0)
+        self.nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=device)
 
-    def _run_papabear(self, texts):
-        """Runs papabear model on the input text file.
+    def _run_mamabear(self, texts):
+        """Runs mamabear model on the input text file.
 
         Args:
-            texts: Documents sent to papabear for classification
+            texts: Documents sent to mamabear for classification
 
         Return:
-            papa_pred: Prediction probability calculated by papabear
+            mama_pred: Prediction probability calculated by mamabear
         """
-        papa_pred = []
+        mama_pred = []
         for text in texts:
             ner = self.nlp(text)
             if not ner:
-                papa_pred += [0]
+                mama_pred += [0]
             else:
-                papa_pred += [1]
-        return {'y_papabear':np.asarray(papa_pred)}
+                mama_pred += [1]
+        return {'y_mamabear':np.asarray(mama_pred)}
 
     def __call__(self, doc):
-        """Alias for _run_papabear.
+        """Alias for _run_mamabear.
 
-        See _run_papabear for documentation.
+        See _run_mamabear for documentation.
         """
-        return self._run_papabear(doc)
+        return self._run_mamabear(doc)
 
-class PapabearClassifierEmotion:
+class MamabearClassifierEmotion:
     """
     """
 
     def __init__(
         self,
         model,
+        device=0,
         tokenizer=None
     ):
         self.model = model
 
-        # self.device = 'cpu'
-        self.classifier = pipeline("text-classification",model=model,device=0, return_all_scores=True)
+        self.classifier = pipeline("text-classification",model=model,device=device, return_all_scores=True)
 
-    def _run_papabear(self, texts):
-        """Runs papabear model on the input text file.
+    def _run_mamabear(self, texts):
+        """Runs mamabear model on the input text file.
 
         Args:
-            texts: Documents sent to papabear for classification
+            texts: Documents sent to mamabear for classification
 
         Return:
-            papa_pred: Prediction probability calculated by papabear
+            mama_pred: Prediction probability calculated by mamabear
         """
         labels = []
         for text in texts:
@@ -136,14 +134,14 @@ class PapabearClassifierEmotion:
             for counter in range(6):
                 score += [prediction[0][counter]['score']]
             labels += [np.argmax(np.asarray(score))]
-        return {'y_papabear':np.asarray(labels)}
+        return {'y_mamabear':np.asarray(labels)}
 
     def __call__(self, doc):
-        """Alias for _run_papabear.
+        """Alias for _run_mamabear.
 
-        See _run_papabear for documentation.
+        See _run_mamabear for documentation.
         """
-        return self._run_papabear(doc)
+        return self._run_mamabear(doc)
 
 
 class TriagedClassifier():
@@ -151,7 +149,7 @@ class TriagedClassifier():
 
     Attributes:
         babybear: babybear model
-        papabear: papabear model
+        mamabear: mamabear model
         metric_threshold: The minimum threshold of the performance metric defined by the user
         metric: The performance metric which is one of the options "accuracy", "precision", "f1_score", "recall
             The default performance metric is "f1_score"
@@ -160,12 +158,12 @@ class TriagedClassifier():
     """
 
     def __init__(
-        self, task, babybear, papabear, metric_threshold, metric=None, confidence_th_options=None
+        self, task, babybear, mamabear, metric_threshold, metric=None, confidence_th_options=None
     ):
         """"""
         super().__init__()
         self.babybear = babybear
-        self.papabear = papabear
+        self.mamabear = mamabear
         self.metric_threshold = metric_threshold
         self.task = task
         self.confidence_th_options = confidence_th_options if len(confidence_th_options)!=0 else np.arange(0,1.005,.005)
@@ -173,14 +171,13 @@ class TriagedClassifier():
 
         # confidence threshold to get the performance closest to the metric_threshold
         self.confidence_th = 1
-        # Percentage of documents which are not sent to papabear after applying inference triage
+        # Percentage of documents which are not sent to mamabear after applying inference triage
         self.saving = []
         self.performance = []
 
         self.tot_time = []
 
     def plot_output(self, saving, accuracy, f1, precision, recall, cut, fold_num):
-        # f = open("../fig/dev_data.pkl",'wb')
         output_dict = {}
         output_dict['saving'] = saving
         output_dict['accuracy'] = accuracy
@@ -238,8 +235,6 @@ class TriagedClassifier():
         performance, p_accuracy, p_f1, p_precision, p_recall, saving = [], [], [], [], [], []
         all_data_size = len(labels)
         train_index = int(0.7*all_data_size)
-        # print(train_index)
-
 
         X_train, X_test_0 = doc[0:train_index], doc[train_index::]
         y_train, y_test_0 = labels[0:train_index], labels[train_index::]
@@ -253,19 +248,19 @@ class TriagedClassifier():
         y_test_0 = np.asarray(y_test_0)
 
         for conf_th in self.confidence_th_options:
-            y_baby_papa = np.copy(y_test_0).reshape(-1, 1)
+            y_baby_mama = np.copy(y_test_0).reshape(-1, 1)
             if self.task == "ner":
                 confident_points = np.where((prob_val >= conf_th) & (predict_val==0))[0]
             else:
                 confident_points = np.where(prob_val >= conf_th)[0]
-            y_baby_papa[confident_points] = predict_val[confident_points]
+            y_baby_mama[confident_points] = predict_val[confident_points]
             diff = predict_val[confident_points] - y_test_0[confident_points].reshape(-1)
             saving.append(len(confident_points)*100/len(predict_val))
-            performance.append(self.evaluate(y_test_0, y_baby_papa, self.metric))
-            p_accuracy.append(self.evaluate(y_test_0, y_baby_papa, "accuracy"))
-            p_f1.append(self.evaluate(y_test_0, y_baby_papa, "f1_score"))
-            p_precision.append(self.evaluate(y_test_0, y_baby_papa, "precision"))
-            p_recall.append(self.evaluate(y_test_0, y_baby_papa, "recall"))
+            performance.append(self.evaluate(y_test_0, y_baby_mama, self.metric))
+            p_accuracy.append(self.evaluate(y_test_0, y_baby_mama, "accuracy"))
+            p_f1.append(self.evaluate(y_test_0, y_baby_mama, "f1_score"))
+            p_precision.append(self.evaluate(y_test_0, y_baby_mama, "precision"))
+            p_recall.append(self.evaluate(y_test_0, y_baby_mama, "recall"))
             
         cut = self._find_nearest(performance, self.metric_threshold)
         self.plot_output(saving, p_accuracy, p_f1, p_precision, p_recall, cut, fold_num)
@@ -352,7 +347,7 @@ class TriagedClassifier():
 
         This function predicts the labels of the input documents. First the prediction
         confidence of all the documents is calculated using babybear model. Then the unconfident
-        docs are triaged and sent to papabear to get the full set of predictions.
+        docs are triaged and sent to mamabear to get the full set of predictions.
 
         Args:
             doc: testing documents
@@ -361,44 +356,40 @@ class TriagedClassifier():
             ModelResult containing:
                 unconfident_idx (np.ndarray): index of unconfident documents
                 predict (np.ndarray): predicted labels.
-                    If the babybear is confident the prediction labels is returned other wise the prediction label is calculated using papabear.
+                    If the babybear is confident the prediction labels is returned other wise the prediction label is calculated using mamabear.
         """
-        # calculate baby_papa_pred
+        # calculate baby_mama_pred
         texts = np.asarray(doc)
         babybear_results = self.babybear(texts)
         
         p_accuracy, p_f1, p_precision, p_recall = [], [], [], []
-        # tot_time = []
-        baby_papa_pred = []
+
+        baby_mama_pred = []
         all_index = np.arange(0, len(texts), 1)
         for ci in self.confidence_th_options:
             t0 = time.time()
-            #unconfident_docs_indx = self._triage_inferences(babybear_results['probs'], ci)
-            baby_papa_pred = np.copy(babybear_results['labels'])
+            baby_mama_pred = np.copy(babybear_results['labels'])
             if self.task == "ner":
                 confident_points = np.where((babybear_results['probs'] >= ci) & (babybear_results['labels']==0))[0]
             else:
                 confident_points = np.where(babybear_results['probs'] >= ci)[0]
             unconfident_docs_indx = np.delete(all_index, confident_points)
             if np.any(unconfident_docs_indx):
-                # uncommnet for timing ???
                 
-                papa_predict_class = self.papabear(texts[unconfident_docs_indx])['y_papabear']
-                #uncomment for  test
-                # papa_predict_class = np.asarray(y_dev[unconfident_docs_indx])
+                mama_predict_class = self.mamabear(texts[unconfident_docs_indx])['y_mamabear']
+
                 
-                baby_papa_pred[unconfident_docs_indx] = papa_predict_class
+                baby_mama_pred[unconfident_docs_indx] = mama_predict_class
             if np.abs(ci - self.confidence_th) < (self.confidence_th_options[1] - self.confidence_th_options[0]):
-                # print(ci)
                 test_unconf = unconfident_docs_indx
-                test_pred = baby_papa_pred
+                test_pred = baby_mama_pred
             t1 = time.time()
-            self.saving.append(len(confident_points)*100/len(baby_papa_pred))
-            self.performance.append(self.evaluate(y_dev, baby_papa_pred, self.metric))
-            p_accuracy.append(self.evaluate(y_dev, baby_papa_pred, "accuracy"))
-            p_f1.append(self.evaluate(y_dev, baby_papa_pred, "f1_score"))
-            p_precision.append(self.evaluate(y_dev, baby_papa_pred, "precision"))
-            p_recall.append(self.evaluate(y_dev, baby_papa_pred, "recall"))
+            self.saving.append(len(confident_points)*100/len(baby_mama_pred))
+            self.performance.append(self.evaluate(y_dev, baby_mama_pred, self.metric))
+            p_accuracy.append(self.evaluate(y_dev, baby_mama_pred, "accuracy"))
+            p_f1.append(self.evaluate(y_dev, baby_mama_pred, "f1_score"))
+            p_precision.append(self.evaluate(y_dev, baby_mama_pred, "precision"))
+            p_recall.append(self.evaluate(y_dev, baby_mama_pred, "recall"))
             self.tot_time.append(t1 - t0)
         print('this is for dev')
         self.plot_output(self.saving, p_accuracy, p_f1, p_precision, p_recall, self.indx_conf_th, 'Dev')

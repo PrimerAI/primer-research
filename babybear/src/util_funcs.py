@@ -13,10 +13,10 @@ def load_data(dataset):
     return train, dev, test
 
 
-def find_ner_x_y(hf_dataset, model_name):
+def find_ner_x_y(hf_dataset, model_name, device=0):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForTokenClassification.from_pretrained(model_name)
-    nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=0)
+    nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=device)
 
     y = []
     text = []
@@ -32,32 +32,8 @@ def find_ner_x_y(hf_dataset, model_name):
             y += [1]
     return text, y, dict_ner
 
-# def find_x_y_emotion(hf_dataset):
-#     x = hf_dataset.text.to_numpy()
-#     y = hf_dataset.label.to_numpy()
-#     return x, y
-
-# def find_x_y_emotion(hf_dataset):
-#     model = AutoModelWithHeads.from_pretrained("bert-base-uncased")
-#     adapter_name = model.load_adapter("AdapterHub/bert-base-uncased-pf-emotion", source="hf")
-#     model.active_adapters = adapter_name
-#     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-#     x = hf_dataset.text.to_numpy()
-#     y = hf_dataset.label.to_numpy()
-#     labels = []
-#     for sentence in x:
-#         tokens = tokenizer.tokenize(sentence)
-#         input_tensor = torch.tensor([
-#             tokenizer.convert_tokens_to_ids(tokens)
-#         ])
-#         outputs = model(input_tensor)
-#         pred_logits = outputs.logits
-#         probs = pred_logits.softmax(dim=-1).detach().cpu().flatten().numpy().tolist()
-#         labels.append(np.argmax(probs))
-#     return x, np.asarray(labels)
-
-def find_x_y_emotion(hf_dataset):
-    classifier = pipeline("text-classification",model='bhadresh-savani/bert-base-uncased-emotion', device=0,  return_all_scores=True)
+def find_x_y_emotion(hf_dataset, device=0):
+    classifier = pipeline("text-classification",model='bhadresh-savani/bert-base-uncased-emotion', device=device,  return_all_scores=True)
     texts = hf_dataset.text.to_numpy()
     labels = []
     for text in texts:
@@ -69,9 +45,9 @@ def find_x_y_emotion(hf_dataset):
 
     return texts, np.asarray(labels)
 
-def find_x_y_sentiment(texts):
+def find_x_y_sentiment(texts,device=0):
     model = 'cardiffnlp/twitter-roberta-base-sentiment-latest'
-    classifier = pipeline("sentiment-analysis", model=model, tokenizer=model, device=0, return_all_scores=True)
+    classifier = pipeline("sentiment-analysis", model=model, tokenizer=model, device=device, return_all_scores=True)
     labels = []
     final_texts = []
     for each_text in texts:
