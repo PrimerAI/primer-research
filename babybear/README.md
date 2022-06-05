@@ -11,7 +11,7 @@ You can generate the results of the paper on emotion recognition with the notebo
 
 The source code is available at `src/` and is separated into following parts:
 * `nlx_babybear.py`: Defines the babybear model
-* `inference_triage.py`: Defines the papabear model and the inference triage scheme
+* `inference_triage.py`: Defines the mamabear model and the inference triage scheme
 * `util_funcs.py`: It contains functions to apply the data preprocessing.
 
 ## Contact 
