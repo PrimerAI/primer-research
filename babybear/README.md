@@ -2,6 +2,8 @@
 
 Implementation code of ["BabyBear: Cheap inference triage for expensive language models"](https://arxiv.org/abs/2205.11747).
 
+Please check our blog post ["How Primer Built an Inference Triage Process Called BabyBear to Save GPU Time"](https://primer.ai/developer/how-primer-built-an-inference-triage-process-called-babybear-to-save-gpu-time/).
+
 
 ## Get Started
 
