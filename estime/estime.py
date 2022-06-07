@@ -335,7 +335,7 @@ class Estime:
                 result.append(cos_raw_avg)
             elif out_name == ESTIME_COHERENCE:
                 result.append(coherence)
-        if self.ranges_min_max:
+        if self.coherence_ranges_min_max:
             for range_min, range_max in self.coherence_ranges_min_max:
                 tau = self.get_kendall_range(itoks_similar, range_min=range_min, range_max=range_max)
                 result.append(tau)
