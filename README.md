@@ -9,4 +9,4 @@ This repository contains implementations and research code to accompany Primer p
 |[Does Summary Evaluation Survive Translation to Other Languages?](https://aclanthology.org/2022.naacl-main.173)| [summary_translation](https://github.com/PrimerAI/primer-research/tree/main/summary_translation)|
 |[Neural Embeddings for Text](https://arxiv.org/abs/2208.08386)| [neural_embeddings](https://github.com/PrimerAI/primer-research/tree/main/neural_embeddings)|
 
-See also summarization evaluation measures (and links to related Primer publicaitons) in BLANC package: https://pypi.org/project/blanc
+See also summarization evaluation measures (and links to related Primer publications) in BLANC package: https://pypi.org/project/blanc
