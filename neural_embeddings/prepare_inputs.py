@@ -6,7 +6,7 @@ import torch
 
 
 class PrepInputs:
-    """Creates neural embedding from text."""
+    """Creates inputs for micro-tuning."""
     def __init__(
         self,
         model_tokenizer,
@@ -18,16 +18,15 @@ class PrepInputs:
         random_shuffle_inputs = True,
     ):
         """
-        layers_emb (List[str]): names of layers to produce neural embeddings.
-            Select only 1D layers layers_emb. (For simplicity not dealing here with 
-            layers of hogher dim - they are too large for an embedding anyways.)
         mask_gaps (List[int]): simplified blueprints for masking. Examples:
             3: mask every 3d token
             2: mask every 2nd token
             -3: mask all except every 3d token
             -4: mask all except every 4th token
-        n_errors_per_epochs_max (int): If >=0 then tuning is stop when number of errors
-            in epoch is not higher than this value.
+        keep_all_batches_on_device (Boolean): If device is 'cuda' (gpu), 
+            setting this to True makes faster processing. Since the size of 
+            the 'dataset' (all batches) in micro-tuning is extremely small,
+            it should be almost always possible to set this to True.
         """
         self.model_tokenizer = model_tokenizer
         self.device = device
