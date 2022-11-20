@@ -173,8 +173,8 @@ class EmbedNeuralTop:
         keep_all_batches_on_device=True,
         keep_hidden_states=True,
         random_shuffle_batches=True,
-        n_epochs=30,
-        learning_rate=5.0e-5,
+        n_epochs=10,
+        learning_rate=1.0e-2,
         dropout=-1,
         random_seed=1
     ):
