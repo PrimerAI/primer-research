@@ -2,9 +2,7 @@
 
 This repository contains or refers to implementations, research code and data related to Primer publications and preprints.
 
-Primer papers and (if available) source:
-
-|Paper|Source|
+|Paper|Source/Data|
 |-|-|
 |[Neural Embeddings for Text. 2022](https://arxiv.org/abs/2208.08386)| [neural_embeddings](https://github.com/PrimerAI/primer-research/tree/main/neural_embeddings)|
 |[BabyBear: Cheap inference triage for expensive language models. 2022](https://arxiv.org/abs/2205.11747)| [babybear](https://github.com/PrimerAI/primer-research/tree/main/babybear)|
@@ -17,8 +15,8 @@ Primer papers and (if available) source:
 |[Towards Human-Free Automatic Quality Evaluation of German Summarization. 2021](https://arxiv.org/abs/2105.06027)||
 |[Is Human Scoring the Best Criteria for Summary Evaluation? 2021](https://aclanthology.org/2021.findings-acl.192/)||
 |[Primer AI's Systems for Acronym Identification and Disambiguation. 2021](http://ceur-ws.org/Vol-2831/paper30.pdf)|[sdu-data](https://github.com/PrimerAI/sdu-data)|
-|[Fill in the BLANC: Human-free quality estimation of document summaries. 2020](https://aclanthology.org/2020.eval4nlp-1.2/)|[blanc](https://pypi.org/project/blanc), [data](https://github.com/PrimerAI/blanc/tree/master/data)|
 |[Sensitivity of BLANC to human-scored qualities of text summaries. 2020](https://arxiv.org/abs/2010.06716)|[blanc](https://pypi.org/project/blanc), [data](https://github.com/PrimerAI/blanc/tree/master/data)|
+|[Fill in the BLANC: Human-free quality estimation of document summaries. 2020](https://aclanthology.org/2020.eval4nlp-1.2/)|[blanc](https://pypi.org/project/blanc), [data](https://github.com/PrimerAI/blanc/tree/master/data)|
 |[Zero-shot topic generation. 2020](https://arxiv.org/abs/2004.13956)||
 |[Headline Generation: Learning from Decomposable Document Titles. 2019](https://arxiv.org/abs/1904.08455)||
 
