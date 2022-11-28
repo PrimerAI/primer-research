@@ -14,12 +14,6 @@ import torch
 from transformers import BertForMaskedLM, BertTokenizer, BertModel
 
 
-# Names of the measures:
-ESTIME_ALARMS = 'alarms'  # original ESTIME by response of tokens to similar contexts
-ESTIME_SOFT = 'soft'  # soft ESTIME by response of cosine between embeddings
-ESTIME_COHERENCE = 'coherence'  # estimation of summary coherence 
-
-
 class Estime:
     """Estimator of factual inconsistencies between summaries (or other textual claims)
     and text. Usage: create `Estime`, and use `evaluate_claims`.
@@ -33,7 +27,7 @@ class Estime:
         path_mdl_raw='bert-base-uncased',
         i_layer_context=21,
         device='cpu',
-        output=[ESTIME_ALARMS],
+        output=['alarms'],
         coherence_ranges_min_max=None,
         tags_check=None,
         tags_exclude=None,
@@ -59,6 +53,7 @@ class Estime:
             distance_word_min (int): minimal distance between the masked tokens 
                 from which embeddings are to ne taken in a single input
             output (List[str]): list of names of measures to get in claim evaluations
+                Possible measures: 'alarms', 'soft', 'coherence'
             coherence_ranges_min_max (List[(int,int)]): List of duples, each duple is
                 min and max ranges to modify Kendall Tau correlation for coherence.
                 The results of summary evaluation will include additional outputs
@@ -68,8 +63,11 @@ class Estime:
         self.i_layer_context = i_layer_context
         self.device = device
         self.output = output
-        self.get_estime_soft = ESTIME_SOFT in self.output
-        self.get_estime_coherence = ESTIME_COHERENCE in self.output
+        self.ESTIME_ALARMS = 'alarms'  # original estime by response of tokens to similar contexts
+        self.ESTIME_SOFT = 'soft'  # soft estime by response of cos between embeddings
+        self.ESTIME_COHERENCE = 'coherence'  # estimation of summary coherence
+        self.get_estime_soft = self.ESTIME_SOFT in self.output
+        self.get_estime_coherence = self.ESTIME_COHERENCE in self.output
         self.coherence_ranges_min_max = coherence_ranges_min_max
         self.tags_check = tags_check
         self.tags_exclude = tags_exclude
@@ -329,11 +327,11 @@ class Estime:
             coherence = scipy.stats.kendalltau(itoks_summ, itoks_text, variant='c').correlation
         result = []
         for out_name in self.output:
-            if out_name == ESTIME_ALARMS:
+            if out_name == self.ESTIME_ALARMS:
                 result.append(n_alarms)
-            elif out_name == ESTIME_SOFT:
+            elif out_name == self.ESTIME_SOFT:
                 result.append(cos_raw_avg)
-            elif out_name == ESTIME_COHERENCE:
+            elif out_name == self.ESTIME_COHERENCE:
                 result.append(coherence)
         if self.coherence_ranges_min_max:
             for range_min, range_max in self.coherence_ranges_min_max:
