@@ -4,6 +4,7 @@ This repository contains or refers to implementations, research code and data re
 
 |Paper|Source/Data|
 |-|-|
+|[Linear Cross-Lingual Mapping of Sentence Embeddings. 2023](https://arxiv.org/abs/2305.14256)| [wikinews](https://github.com/PrimerAI/primer-research/tree/main/wikinews)|
 |[Neural Embeddings for Text. 2022](https://arxiv.org/abs/2208.08386)| [neural_embeddings](https://github.com/PrimerAI/primer-research/tree/main/neural_embeddings)|
 |[BabyBear: Cheap inference triage for expensive language models. 2022](https://arxiv.org/abs/2205.11747)| [babybear](https://github.com/PrimerAI/primer-research/tree/main/babybear)|
 |[Named Entity Linking with Entity Representation by Multiple Embeddings. 2022](https://arxiv.org/abs/2205.10498)||
