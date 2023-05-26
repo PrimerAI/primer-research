@@ -10,8 +10,6 @@ List of languages are: Spanish, French, German, Portuguese, Polish, Italian, Chi
 Weakly aligned multilingual pararell sentence datasets can be constructed by comparing the titles and contents of the WikiNews pages that are linked to the same English WikiNews page (in the dataset, they have the same pageid).
 Following is the example case where titles of the same pageid are retrieved.
 
-Here is the three column table in markdown format:
-
 | News title                                                    | Language | type              |
 |---------------------------------------------------------------|----------|-------------------|
 | Bomb blast in Delhi kills 12, injures 62                      | English  | title      |
@@ -31,8 +29,6 @@ Here is the three column table in markdown format:
 | 3 | Čína připustila, že tamní korupce je vážný pro...           | 232226 | [China, December 30, 2010, Politics and confli...] | cs   | https://cs.wikinews.org/wiki/%C4%8C%C3%ADna_p%...                                        | [Zpráva čínské vlády připouští, že korupce v z... | Středa 29. prosince 2010 | interlang link |
 | 4 | China admite que la corrupción en el país es '...           | 232226 | [China, December 30, 2010, Politics and confli...] | es   | https://es.wikinews.org/wiki/China_admite_que_...                                       | [29 de diciembre de 2010Beijing, China —, Un r... | None                        | interlang link |
 
-
- 
 
 ## Variables
 
