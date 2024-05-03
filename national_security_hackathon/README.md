@@ -2,7 +2,7 @@
 
 ## Overview
 
-This dataset is a collection of news articles from a variety of sources in English, Russian, and Chinese. The dataset is intended for use in the National Security Hackathon May 4th/5th, 2024 and was curated by Primer AI. One recommended usage of this data is to compare aspects of coverage on the same events, entities, organizations, narratives, topics, etc. across a control group and foreign sources.
+This dataset is a collection of news articles from a variety of Russian, Chinese, and North American sources. The dataset is intended for use in the National Security Hackathon May 4th/5th, 2024 and was curated by Primer AI. One recommended usage of this data is to compare aspects of coverage on the same events, entities, organizations, narratives, topics, etc. across a control group and foreign sources.
 
 ## Dataset Composition
 ```md
