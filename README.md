@@ -4,7 +4,9 @@ This repository contains or refers to implementations, research code and data re
 
 |Paper|Source/Data|
 |-|-|
-|[Linear Cross-Lingual Mapping of Sentence Embeddings. 2023](https://arxiv.org/abs/2305.14256)| [wikinews](https://github.com/PrimerAI/primer-research/tree/main/wikinews)|
+|[Preserving Multilingual Quality While Tuning Query Encoder on English Only. 2024](https://arxiv.org/abs/2407.00923)|[arxiv-negatives](https://huggingface.co/datasets/primer-ai/arxiv-negatives)|
+|[How to Discern Important Urgent News? 2024](https://arxiv.org/abs/2402.10302)||
+|[Linear Cross-Lingual Mapping of Sentence Embeddings. 2024](https://aclanthology.org/2024.findings-acl.486)| [wikinews](https://github.com/PrimerAI/primer-research/tree/main/wikinews) (or [here](https://huggingface.co/datasets/Fumika/Wikinews-multilingual))|
 |[Neural Embeddings for Text. 2022](https://arxiv.org/abs/2208.08386)| [neural_embeddings](https://github.com/PrimerAI/primer-research/tree/main/neural_embeddings)|
 |[BabyBear: Cheap inference triage for expensive language models. 2022](https://arxiv.org/abs/2205.11747)| [babybear](https://github.com/PrimerAI/primer-research/tree/main/babybear)|
 |[Named Entity Linking with Entity Representation by Multiple Embeddings. 2022](https://arxiv.org/abs/2205.10498)||
