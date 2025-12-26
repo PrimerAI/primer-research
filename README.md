@@ -4,7 +4,8 @@ This repository contains or refers to implementations, research code and data re
 
 |Paper|Source/Data|
 |-|-|
-|[Preserving Multilingual Quality While Tuning Query Encoder on English Only. 2024](https://arxiv.org/abs/2407.00923)|[arxiv-negatives](https://huggingface.co/datasets/primer-ai/arxiv-negatives)|
+|[How important is Recall for Measuring Retrieval Quality? 2025](https://arxiv.org/abs/2512.20854)|[retrieval-response](https://huggingface.co/datasets/primer-ai/retrieval-response)|
+|[Preserving Multilingual Quality While Tuning Query Encoder on English Only. 2025](https://aclanthology.org/2025.naacl-short.28)|[arxiv-negatives](https://huggingface.co/datasets/primer-ai/arxiv-negatives)|
 |[How to Discern Important Urgent News? 2024](https://arxiv.org/abs/2402.10302)||
 |[Linear Cross-Lingual Mapping of Sentence Embeddings. 2024](https://aclanthology.org/2024.findings-acl.486)| [wikinews](https://github.com/PrimerAI/primer-research/tree/main/wikinews) (or [here](https://huggingface.co/datasets/Fumika/Wikinews-multilingual))|
 |[Neural Embeddings for Text. 2022](https://arxiv.org/abs/2208.08386)| [neural_embeddings](https://github.com/PrimerAI/primer-research/tree/main/neural_embeddings)|
@@ -22,6 +23,4 @@ This repository contains or refers to implementations, research code and data re
 |[Fill in the BLANC: Human-free quality estimation of document summaries. 2020](https://aclanthology.org/2020.eval4nlp-1.2/)|[blanc](https://pypi.org/project/blanc), [data](https://github.com/PrimerAI/blanc/tree/master/data)|
 |[Zero-shot topic generation. 2020](https://arxiv.org/abs/2004.13956)||
 |[Headline Generation: Learning from Decomposable Document Titles. 2019](https://arxiv.org/abs/1904.08455)||
-
-
 
