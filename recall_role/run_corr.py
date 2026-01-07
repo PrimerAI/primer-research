@@ -4,7 +4,7 @@ import time
 import json
 import yaml
 
-from .load_data import DataPrep
+from .corr import DataPrep
 
 def run_config(config):
     with open(config_name,'r') as ymlfile:
