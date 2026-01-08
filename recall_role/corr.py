@@ -64,7 +64,10 @@ class DataPrep:
     def _load_data(self) -> None:
         """Prepares data as described in _get_segments_crude()"""
         with open(self.fname_data, 'r') as f:
-            samps: list[Sample] = json.load(f)
+            samps: list[Sample] = [
+                Sample(**x)
+                for x in json.load(f)
+            ]
         self.map_idFull_sample = self._make_map_full_samples(samps)
         self.segments_data = self._get_segments_crude(samps)
 
@@ -140,7 +143,7 @@ class DataPrep:
             map_segment_data[id_segment] = copy.deepcopy(self.data_segment)
         if self.extend_xK > 1: # for estimated total number of positives
             id2 = self._get_idFull_ofsample(sample, xK=self.extend_xK)
-            sample2 = self.map_idFull_sample.get(id2, None)
+            sample2 = self.map_idFull_sample.get(id2)
             if not sample2:
                 return
             map_segment_data[id_segment].S2_np.append(sum(sample2.inK))
@@ -170,7 +173,7 @@ class DataPrep:
                     v = c[corr]
                     if v > corr_values_max[corr][1]:
                         corr_values_max[corr] = (a, float(round(v, precision)))
-            segment_info[use_case] = {'max': corr_values_max, 'N': len(segment['Nc'])}
+            segment_info[use_case.use_case_code] = {'max': corr_values_max, 'N': len(segment.Nc)}
         return segment_info
 
 
