@@ -1,0 +1,12 @@
+data_prep:
+  fname_data: _CWD_/samples_graded.json
+  embs: ['AML12v2','E5Sv2','ME5S','MQML6Cv1']
+  min_segment_samples: 300
+  segment_ratio_precision: 1
+  def_segments: crude_KtoNp
+  extend_xK: 1
+corr:
+  corrs: ['corr_k_b','corr_k_c','corr_s','corr_p']
+  use_cases: ['mF^l350^0.95', 'mNDCG^x', 'mT^l350^0.95']
+save:
+  fname_save_prefix: _CWD_/example_1

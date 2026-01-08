@@ -4,7 +4,7 @@ This repository contains or refers to implementations, research code and data re
 
 |Paper|Source/Data|
 |-|-|
-|[How important is Recall for Measuring Retrieval Quality? 2025](https://arxiv.org/abs/2512.20854)|[retrieval-response](https://huggingface.co/datasets/primer-ai/retrieval-response)|
+|[How important is Recall for Measuring Retrieval Quality? 2025](https://arxiv.org/abs/2512.20854)|[recall_role](https://github.com/PrimerAI/primer-research/tree/main/recall_role), [retrieval-response](https://huggingface.co/datasets/primer-ai/retrieval-response)|
 |[Preserving Multilingual Quality While Tuning Query Encoder on English Only. 2025](https://aclanthology.org/2025.naacl-short.28)|[arxiv-negatives](https://huggingface.co/datasets/primer-ai/arxiv-negatives)|
 |[How to Discern Important Urgent News? 2024](https://arxiv.org/abs/2402.10302)||
 |[Linear Cross-Lingual Mapping of Sentence Embeddings. 2024](https://aclanthology.org/2024.findings-acl.486)| [wikinews](https://github.com/PrimerAI/primer-research/tree/main/wikinews) (or [here](https://huggingface.co/datasets/Fumika/Wikinews-multilingual))|
