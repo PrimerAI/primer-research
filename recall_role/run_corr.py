@@ -5,6 +5,8 @@ import json
 import yaml
 
 from .corr import DataPrep
+from .data_types import UseCase
+
 
 def run_config(config):
     with open(config_name,'r') as ymlfile:
@@ -19,7 +21,7 @@ def run_config(config):
     cfg_prep['fname_data'] = fname_data
 
     cfg_corr = cfg['corr']
-    use_cases = cfg_corr['use_cases']
+    use_cases = [UseCase(x) for x in cfg_corr['use_cases']]
     corrs = cfg_corr.get('corrs', ['corr_k_b','corr_k_c','corr_s','corr_p'])
 
     cfg_save = cfg['save']
