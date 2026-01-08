@@ -3,9 +3,10 @@ from typing import Literal
 import os
 import json
 import copy
-import numpy as np
 import math
 from scipy.stats import kendalltau, spearmanr, pearsonr
+
+from .data_types import Sample, SegmentData, UseCase
 
 
 class DataPrep:
@@ -21,16 +22,21 @@ class DataPrep:
         self.min_segment_samples = self.config.get('min_segment_samples',1)
         self.extend_xK = self.config.get('extend_xK', 1) # for estimating total positives
         # convenient:
-        self.data_segment = {'Nc':[], 'Np':[], 'K':[], 'G':[], 'inK':[]} # in a segment
-        if self.extend_xK > 1: # add storage for estimated total positives  
-            self.data_segment['S2_np'] = [] # positives in a sample with xK larger K
-        self.segments_data = None # prepared data, as the output of _load_data()
-        self.map_idFull_sample = None
+        self.data_segment = SegmentData(
+            Nc=[],
+            Np=[],
+            K=[],
+            grade=[],
+            inK=[],
+            S2_np=[],
+        ) # in a segment
+        self.segments_data: list[tuple[str, SegmentData]] = [] # prepared data, as the output of _load_data()
+        self.map_idFull_sample: dict[str, Sample] = {}
         self._load_data() # prepare data for calculating correlations
 
     def get_correlations(
         self,
-        use_cases: list[str],
+        use_cases: list[UseCase],
         corrs: list[Literal['corr_k_b', 'corr_k_c', 'corr_s', 'corr_p']],
         precision: int = 8,
     ) -> list[tuple[str, dict]]:
@@ -58,11 +64,11 @@ class DataPrep:
     def _load_data(self) -> None:
         """Prepares data as described in _get_segments_crude()"""
         with open(self.fname_data, 'r') as f:
-            samps = json.load(f)
+            samps: list[Sample] = json.load(f)
         self.map_idFull_sample = self._make_map_full_samples(samps)
         self.segments_data = self._get_segments_crude(samps)
 
-    def _make_map_full_samples(self, samps: list[dict]) -> dict[str, dict]:
+    def _make_map_full_samples(self, samps: list[Sample]) -> dict[str, Sample]:
         map_idFull_sample = {}
         for s in samps:
             idFull = self._get_idFull_ofsample(s)
@@ -70,7 +76,7 @@ class DataPrep:
             map_idFull_sample[idFull] = s
         return map_idFull_sample
 
-    def _get_idFull_ofsample(self, s: dict, xK: float = 1) -> str:
+    def _get_idFull_ofsample(self, s: Sample, xK: float = 1) -> str:
         """
         Arguments:
           s: a sample
@@ -79,13 +85,13 @@ class DataPrep:
           Unique sample Id
         """
         if xK > 1: # define larger K - eeded for estimating count total positives
-            id_K = round(s['K'] * xK) # larger top K interval, only for estimating Np
+            id_K = round(s.K * xK) # larger top K interval, only for estimating Np
         else:
-            id_K = s['K']
-        id_sample = s.get('id') # this includes subset Id and id of the sample in it
-        return id_sample+'^'+s['E']+'^'+str(s['Nc'])+'^'+str(s['Np'])+'^'+str(id_K)
+            id_K = s.K
+        id_sample = s.id  # this includes subset Id and id of the sample in it
+        return id_sample+'^'+s.E+'^'+str(s.Nc)+'^'+str(s.Np)+'^'+str(id_K)
 
-    def _get_segments_crude(self, samps: list[dict]) -> list[tuple[str, dict]]:
+    def _get_segments_crude(self, samps: list[Sample]) -> list[tuple[str, SegmentData]]:
         """
         Given samples as loaded from samples_graded.json (of retrieval-response dataset),
         returns the data arranged by segments, data for each segment (subset) are in
@@ -98,28 +104,28 @@ class DataPrep:
             'Nc' -> Array List[int] of total number of candidates
             'Np' -> Array List[int] of total number of positives
             'K'  -> Array List[int] of K values (defining top-K selection)
-            'G'  -> Array List[int] of grades assigned by LLM to quality of a response
+            'grade'  -> Array List[int] of grades assigned by LLM to quality of a response
             'inK'-> Array List[List[int]], each element is an array of K (top) values, 
                 each value is 0 (irrelevant doc) or 1 (relevant doc)
             'S2_np' -> Array List[int] of estimated total number of positives.
                 Exists only if it was set extend_xK>1, i.e. more than K top elements
                 were selected for estimating the total Np (e.g. for the measure 'mE')
         """
-        map_segment_data = {}
+        map_segment_data: dict[str, SegmentData] = {}
         for s in samps:
-            subset_name = s['id'].split('-')[0]
+            subset_name = s.id.split('-')[0]
             if self.def_segments == 'crude_split_nw':
-                fit = '1' if s['Np'] <= s['K'] else '0' # '1'=wide; '0'=narrow
-                segment = s['E'] +'^'+ subset_name +'^'+ fit
+                fit = '1' if s.Np <= s.K else '0' # '1'=wide; '0'=narrow
+                segment = s.E +'^'+ subset_name +'^'+ fit
             else: # self.def_segments == 'crude_KtoNp':
-                ratio = round(s['K']/s['Np'],self.segment_ratio_precision)
-                segment = s['E'] +'^'+ subset_name +'^KtoN^'+ str(ratio)
+                ratio = round(s.K/s.Np,self.segment_ratio_precision)
+                segment = s.E +'^'+ subset_name +'^KtoN^'+ str(ratio)
             self._add_sample_to_segment(map_segment_data, segment, s)
         map_segment_data = {k:v for k,v in map_segment_data.items()
-                            if len(v['Nc'])>=self.min_segment_samples}
+                            if len(v.Nc)>=self.min_segment_samples}
         return sorted(list(map_segment_data.items()))
 
-    def _add_sample_to_segment(self, map_segment_data: dict[str, dict], id_segment: str, sample: dict) -> None:
+    def _add_sample_to_segment(self, map_segment_data: dict[str, SegmentData], id_segment: str, sample: Sample) -> None:
         """
         Adds a sample's data into map_segment_data under the provided id_segment
         Arguments:
@@ -134,44 +140,32 @@ class DataPrep:
             map_segment_data[id_segment] = copy.deepcopy(self.data_segment)
         if self.extend_xK > 1: # for estimated total number of positives
             id2 = self._get_idFull_ofsample(sample, xK=self.extend_xK)
-            sample2 = self.map_idFull_sample.get(id2)
+            sample2 = self.map_idFull_sample.get(id2, None)
             if not sample2:
                 return
-            map_segment_data[id_segment]['S2_np'].append(sum(sample2['inK']))
-        map_segment_data[id_segment]['Nc'].append(sample['Nc'])
-        map_segment_data[id_segment]['Np'].append(sample['Np'])
-        map_segment_data[id_segment]['K'].append(sample['K'])
-        map_segment_data[id_segment]['G'].append(sample['grade'])
-        map_segment_data[id_segment]['inK'].append(sample['inK'])
+            map_segment_data[id_segment].S2_np.append(sum(sample2.inK))
+        map_segment_data[id_segment].Nc.append(sample.Nc)
+        map_segment_data[id_segment].Np.append(sample.Np)
+        map_segment_data[id_segment].K.append(sample.K)
+        map_segment_data[id_segment].grade.append(sample.grade)
+        map_segment_data[id_segment].inK.append(sample.inK)
 
     def _get_correlations_for_segment(
         self,
-        use_cases: list[str],
+        use_cases: list[UseCase],
         corrs: list[Literal['corr_k_b', 'corr_k_c', 'corr_s', 'corr_p']],
         precision: int,
-        segment: dict,
+        segment: SegmentData,
     ) -> dict[str, dict]:
         segment_info = {}
         for use_case in use_cases:
             corr_values_max = {corr:(-1,-1,-math.inf) for corr in corrs} # w,a,maxvalue
-            usage = use_case.split('^')
-            if usage[1] == 'x': # No alpha
-                alpha_range = np.zeros(1)
-            elif usage[1][0] == 'l': # log-scale
-                n_range, base = int(usage[1][1:]), float(usage[2])
-                alphas = np.logspace(1, n_range, num=n_range, base=base)
-                alphasR = 1 - alphas
-                alpha_range = np.concatenate((
-                    np.zeros(1), np.flip(alphas), alphasR, np.ones(1)))
-                alpha_range = sorted(alpha_range)
-            else: # simple range
-                a0, a1, ad = float(usage[1]), float(usage[2]), float(usage[3])
-                alpha_range = np.arange(a0, a1, ad)
-            anp, ann, andcg = get_array_simplevalues_for_samples(segment['inK'])
-            for a in alpha_range:
-                arr_measure = get_measure_array(usage[0], anp, ann, andcg, a, segment)
+
+            anp, ann, andcg = get_array_simplevalues_for_samples(segment.inK)
+            for a in use_case.alpha_range:
+                arr_measure = get_measure_array(use_case.measure, anp, ann, andcg, a, segment)
                 c = get_correlations_of_two_arrays(
-                    arr_measure, segment['G'], corrs=corrs)
+                    arr_measure, segment.grade, corrs=corrs)
                 for corr in corrs: # Check for max value
                     v = c[corr]
                     if v > corr_values_max[corr][1]:
@@ -186,7 +180,7 @@ def get_measure_array(
     ann: list[int],
     andcg: list[float],
     a: float,
-    segment: dict,
+    segment: SegmentData,
 ) -> list[float]:
     """Considering arrays over all samples of a segment (subset).
     Arguments:
@@ -198,11 +192,11 @@ def get_measure_array(
     """
     # Known Np: Measure F
     if measure == 'mF':
-        aNp = segment['Np'] # array of total number of positives (for each sample)
+        aNp = segment.Np # array of total number of positives (for each sample)
         arr = [np/(a*(np+nn) + (1-a)*Np) for (np,nn,Np) in zip(anp,ann,aNp)]
     # Estimated Np: Measure F with estimated Np
     elif measure == 'mE':
-        aNp = segment['S2_np'] # This is how it differs from F: estimated total positives
+        aNp = segment.S2_np # This is how it differs from F: estimated total positives
         arr = [np/(a*(np+nn) + (1-a)*(Np+1.0e-10)) for (np,nn,Np) in zip(anp,ann,aNp)]
     # Not using Np: Measure nDCG and measure T
     elif measure == 'mNDCG':
@@ -230,8 +224,8 @@ def get_array_simplevalues_for_samples(
 
 
 def get_correlations_of_two_arrays(
-    a: list[float],
-    b: list[float],
+    a: list[int] | list[float],
+    b: list[int] | list[float],
     corrs: list[Literal['corr_k_b', 'corr_k_c', 'corr_s', 'corr_p']] = ['corr_s'],
 ) -> dict:
     corrs_out = {}
