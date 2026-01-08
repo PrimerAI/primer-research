@@ -1,4 +1,5 @@
-import sys
+from typing import Literal
+
 import os
 import json
 import copy
@@ -27,7 +28,12 @@ class DataPrep:
         self.map_idFull_sample = None
         self._load_data() # prepare data for calculating correlations
 
-    def get_correlations(self, use_cases, corrs, precision=8):
+    def get_correlations(
+        self,
+        use_cases: list[str],
+        corrs: list[Literal['corr_k_b', 'corr_k_c', 'corr_s', 'corr_p']],
+        precision: int = 8,
+    ) -> list[tuple[str, dict]]:
         """
         Each use case (in use_cases) specifies:
           1. A measure to calculate: mF = F measure; mE = F measure with estinated Np;
@@ -49,14 +55,14 @@ class DataPrep:
             segments_info.append((seg_name, segment_info))
         return segments_info
 
-    def _load_data(self):
+    def _load_data(self) -> None:
         """Prepares data as described in _get_segments_crude()"""
         with open(self.fname_data, 'r') as f:
             samps = json.load(f)
         self.map_idFull_sample = self._make_map_full_samples(samps)
         self.segments_data = self._get_segments_crude(samps)
 
-    def _make_map_full_samples(self, samps):
+    def _make_map_full_samples(self, samps: list[dict]) -> dict[str, dict]:
         map_idFull_sample = {}
         for s in samps:
             idFull = self._get_idFull_ofsample(s)
@@ -64,7 +70,7 @@ class DataPrep:
             map_idFull_sample[idFull] = s
         return map_idFull_sample
 
-    def _get_idFull_ofsample(self, s, xK=1):
+    def _get_idFull_ofsample(self, s: dict, xK: float = 1) -> str:
         """
         Arguments:
           s: a sample
@@ -79,7 +85,7 @@ class DataPrep:
         id_sample = s.get('id') # this includes subset Id and id of the sample in it
         return id_sample+'^'+s['E']+'^'+str(s['Nc'])+'^'+str(s['Np'])+'^'+str(id_K)
 
-    def _get_segments_crude(self, samps):
+    def _get_segments_crude(self, samps: list[dict]) -> list[tuple[str, dict]]:
         """
         Given samples as loaded from samples_graded.json (of retrieval-response dataset),
         returns the data arranged by segments, data for each segment (subset) are in
@@ -113,7 +119,7 @@ class DataPrep:
                             if len(v['Nc'])>=self.min_segment_samples}
         return sorted(list(map_segment_data.items()))
 
-    def _add_sample_to_segment(self, map_segment_data, id_segment, sample):
+    def _add_sample_to_segment(self, map_segment_data: dict[str, dict], id_segment: str, sample: dict) -> None:
         """
         Adds a sample's data into map_segment_data under the provided id_segment
         Arguments:
@@ -130,16 +136,21 @@ class DataPrep:
             id2 = self._get_idFull_ofsample(sample, xK=self.extend_xK)
             sample2 = self.map_idFull_sample.get(id2)
             if not sample2:
-                return False
+                return
             map_segment_data[id_segment]['S2_np'].append(sum(sample2['inK']))
         map_segment_data[id_segment]['Nc'].append(sample['Nc'])
         map_segment_data[id_segment]['Np'].append(sample['Np'])
         map_segment_data[id_segment]['K'].append(sample['K'])
         map_segment_data[id_segment]['G'].append(sample['grade'])
         map_segment_data[id_segment]['inK'].append(sample['inK'])
-        return True
 
-    def _get_correlations_for_segment(self, use_cases, corrs, precision, segment):
+    def _get_correlations_for_segment(
+        self,
+        use_cases: list[str],
+        corrs: list[Literal['corr_k_b', 'corr_k_c', 'corr_s', 'corr_p']],
+        precision: int,
+        segment: dict,
+    ) -> dict[str, dict]:
         segment_info = {}
         for use_case in use_cases:
             corr_values_max = {corr:(-1,-1,-math.inf) for corr in corrs} # w,a,maxvalue
@@ -169,7 +180,14 @@ class DataPrep:
         return segment_info
 
 
-def get_measure_array(measure, anp, ann, andcg, a, segment):
+def get_measure_array(
+    measure: Literal['mF', 'mE', 'mNDCG', 'mT'],
+    anp: list[int],
+    ann: list[int],
+    andcg: list[float],
+    a: float,
+    segment: dict,
+) -> list[float]:
     """Considering arrays over all samples of a segment (subset).
     Arguments:
         measure: One of these - 'mF', 'mE', 'mNDCG', 'mT'
@@ -194,7 +212,9 @@ def get_measure_array(measure, anp, ann, andcg, a, segment):
     return arr
 
 
-def get_array_simplevalues_for_samples(selections_inK):
+def get_array_simplevalues_for_samples(
+    selections_inK: list[list[Literal[0, 1]]],
+) -> tuple[list[int], list[int], list[float]]:
     anp, ann, andcg = [], [], []
     for selection_inK in selections_inK:
         K = len(selection_inK)
@@ -202,14 +222,18 @@ def get_array_simplevalues_for_samples(selections_inK):
         nn = K - sum(selection_inK)
         dcg = sum(r/math.log2(2+i) for i,r in enumerate(selection_inK))
         idcg = 0 if np==0 else sum(1/math.log2(2+i) for i in range(np))
-        ndcg = 0 if idcg==0 else dcg/idcg
+        ndcg = 0. if idcg==0 else dcg/idcg
         anp.append(np)
         ann.append(nn)
         andcg.append(ndcg)
     return anp, ann, andcg
 
 
-def get_correlations_of_two_arrays(a, b, corrs=['corr_s']):
+def get_correlations_of_two_arrays(
+    a: list[float],
+    b: list[float],
+    corrs: list[Literal['corr_k_b', 'corr_k_c', 'corr_s', 'corr_p']] = ['corr_s'],
+) -> dict:
     corrs_out = {}
     for corr in corrs:
         if corr == 'corr_s':
